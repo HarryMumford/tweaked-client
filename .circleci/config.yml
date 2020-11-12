@@ -62,7 +62,7 @@ jobs:
       - checkout
       - run:
           name: Show current branch
-          command: echo ${CURRENT_BRANCH}
+          command: echo $CURRENT_BRANCH
       - run:
           name: Installing AWS CLI
           working_directory: /
@@ -76,8 +76,6 @@ jobs:
             npm run build
             cd build
             zip ../build.zip -r * .[^.]*
-            echo "${DISTRIBUTION_ID_PROD}"
-            echo ${DISTRIBUTION_ID_PROD}
             echo "Build successful"
       - run:
           name: Deploy to AWS S3
