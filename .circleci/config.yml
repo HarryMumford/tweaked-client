@@ -26,36 +26,36 @@ jobs:
     docker:
       - image: circleci/node:14.15.0
     working_directory: ~/repo
-     steps:
-      - checkout
-      - run:
-          name: Show current branch
-          command: echo ${CURRENT_BRANCH}
-      - run:
-          name: Installing AWS CLI
-          working_directory: /
-          command: |
-            sudo apt-get -y -qq update
-            sudo apt-get install -y awscli
-            sudo apt-get -y python-pip python-dev build-essential
-      - run:
-          name: Build project
-          command: |
-            npm install
-            npm run build
-            cd build
-            zip ../build.zip -r * .[^.]*
-            echo "Build successful"
-      - run:
-          name: Deploy to AWS S3
-          command: |
-            if [ "${CURRENT_BRANCH}" == "master"]
-            then
-              aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
-            elif [ "${CURRENT_BRANCH}" == "staging"]
-            then 
-              aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
-            fi 
+      steps:
+        - checkout
+        - run:
+            name: Show current branch
+            command: echo ${CURRENT_BRANCH}
+        - run:
+            name: Installing AWS CLI
+            working_directory: /
+            command: |
+              sudo apt-get -y -qq update
+              sudo apt-get install -y awscli
+              sudo apt-get -y python-pip python-dev build-essential
+        - run:
+            name: Build project
+            command: |
+              npm install
+              npm run build
+              cd build
+              zip ../build.zip -r * .[^.]*
+              echo "Build successful"
+        - run:
+            name: Deploy to AWS S3
+            command: |
+              if [ "${CURRENT_BRANCH}" == "master"]
+              then
+                aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
+              elif [ "${CURRENT_BRANCH}" == "staging"]
+              then 
+                aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
+              fi 
 
  deploy-to-aws-cloudfront:
     docker:
