@@ -76,19 +76,20 @@ jobs:
             npm run build
             cd build
             zip ../build.zip -r * .[^.]*
+            echo "${DISTRIBUTION_ID_PROD}"
+            echo ${DISTRIBUTION_ID_PROD}
             echo "Build successful"
       - run:
           name: Deploy to AWS S3
           command: |
-            echo ${DISTRIBUTION_ID_PROD}
             aws configure set preview.cloudfront
             if [ "${CURRENT_BRANCH}" == "master"]
             then
-              aws cloudfront create-invalidation --distribution-id "${DISTRIBUTION_ID_PROD}" --paths /\*
+              aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID_PROD} --paths /\*
             elif [ "${CURRENT_BRANCH}" == "staging"]
-              aws cloudfront create-invalidation --distribution-id "${DISTRIBUTION_ID_STAGING}" --paths /\*
+              aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID_STAGING} --paths /\*
             then 
-              aws cloudfront create-invalidation --distribution-id "${DISTRIBUTION_ID_DEV}" --paths /\*
+              aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID_DEV} --paths /\*
             fi
 workflows:
   build_and_deploy:
