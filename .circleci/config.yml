@@ -11,7 +11,7 @@ jobs:
           name: Show current branch
           command: echo ${CURRENT_BRANCH}
       - restore_cache:
-          key:
+          keys:
             - app-{{ checksum "package.json"}}
             - app-
       - run:
@@ -21,7 +21,6 @@ jobs:
           paths:
             - node_modules
           key: app-{{ checksum "package.json"}}
-
   deploy-to-aws-s3:
     docker:
       - image: circleci/node:14.15.0
@@ -55,9 +54,8 @@ jobs:
             elif [ "${CURRENT_BRANCH}" == "staging"]
             then 
               aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
-            fi 
-
- deploy-to-aws-cloudfront:
+            fi
+  deploy-to-aws-cloudfront:
     docker:
       - image: circleci/node:14.15.0
     working_directory: ~/repo
@@ -92,8 +90,7 @@ jobs:
               aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID_STAGING} --paths /\*
             then 
               aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID_DEV} --paths /\*
-            fi 
-
+            fi
 workflows:
   build_and_deploy:
     jobs:
@@ -108,11 +105,11 @@ workflows:
                 - staging
                 - master
       - deploy-to-aws-cloudfront:
-                requires:
-                  - build
-                filters:
-                  branches:
-                    only:
-                      - develop
-                      - staging
-                      - master
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - develop
+                - staging
+                - master
