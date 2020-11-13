@@ -49,10 +49,10 @@ jobs:
           command: |
             if [ "$CIRCLE_BRANCH" == "master"]
             then
-              aws --region $AWS_REGION s3 sync ~/repo/build s3://$AWS_BUCKET_PROD --delete
+              aws --region $AWS_REGION s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
             elif [ "$CIRCLE_BRANCH" == "staging"]
             then 
-              aws --region $AWS_REGION s3 sync ~/repo/build s3://$AWS_BUCKET_PROD --delete
+              aws --region $AWS_REGION s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
             fi
   deploy-to-aws-cloudfront:
     docker:
@@ -87,7 +87,7 @@ jobs:
             elif [ "$CIRCLE_BRANCH" == "staging"]
               aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_STAGING --paths /\*
             then 
-              aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DEV --paths /\*
+              aws cloudfront create-invalidation --distribution-id E2U6Y8B6GRCUPA --paths /\*
             fi
 workflows:
   build_and_deploy:
