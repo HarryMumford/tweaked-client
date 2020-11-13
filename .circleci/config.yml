@@ -34,8 +34,9 @@ jobs:
           name: Installing AWS CLI
           working_directory: /
           command: |
-            sudo apt-get -y -qq update
-            sudo apt-get install -y awscli
+            sudo apt-get install python-dev python-pip
+            sudo pip install awscli
+            echo awscli --version
       - run:
           name: Build project
           command: |
@@ -87,7 +88,7 @@ jobs:
             elif [ "$CIRCLE_BRANCH" == "staging"]
               aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_STAGING --paths /\*
             then 
-              aws cloudfront create-invalidation --distribution-id E2U6Y8B6GRCUPA --paths /\*
+              aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DEV --paths /\*
             fi
 workflows:
   build_and_deploy:
