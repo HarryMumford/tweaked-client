@@ -41,8 +41,7 @@ jobs:
           command: |
             npm install
             npm run build
-            cd build
-            zip ../build.zip -r * .[^.]*
+            zip build.zip -r build
             echo "Build successful"
       - run:
           name: Deploy to AWS S3
@@ -53,6 +52,8 @@ jobs:
             elif [ "$CIRCLE_BRANCH" == "staging"]
             then 
               aws --region $AWS_REGION s3 sync ~/repo/build s3://${AWS_BUCKET_PROD} --delete
+            else
+              aws --region $AWS_REGION s3 sync ~/repo/build s3://${AWS_BUCKET_STAGING} --delete
             fi
   deploy-to-aws-cloudfront:
     docker:
@@ -74,8 +75,7 @@ jobs:
           command: |
             npm install
             npm run build
-            cd build
-            zip ../build.zip -r * .[^.]*
+            zip build.zip -r build
             echo "Build successful"
       - run:
           name: Activate cloudfront
@@ -89,8 +89,9 @@ jobs:
             then
               aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_PROD --paths "/*"
             elif [ "$CIRCLE_BRANCH" == "staging"]
+            then
               aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_STAGING --paths "/*"
-            then 
+            else
               aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DEV --paths "/*"
             fi
 workflows:
