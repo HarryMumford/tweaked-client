@@ -1,48 +1,62 @@
 version: 2.1
 
+executors:
+  app-executor:
+    docker:
+      - image: circleci/node:14.15.0
+    working_directory: ~/repo
+
+aliases:
+  - &show-current-branch-name
+    run:
+      name: Show current branch
+      command: echo $CIRCLE_BRANCH
+  - &restore-cache
+    restore_cache:
+      keys:
+        - app-{{ checksum "package.json"}}
+        - app-
+  - &install-dependencies
+    run:
+      name: Install dependencies
+      command: npm install
+  - &save-cache
+    save_cache:
+      paths:
+        - node_modules
+      key: app-{{ checksum "package.json"}}
+  - &install-aws-cli
+    run:
+      name: Installing AWS CLI
+      working_directory: /
+      command: |
+        sudo apt-get install python-dev python-pip
+        sudo pip install awscli
+  - &build-project
+    run:
+      name: Build project
+      command: |
+        npm install
+        npm run build
+        zip build.zip -r build
+        echo "Build successful"
+
 jobs:
   build:
-    docker:
-      - image: circleci/node:14.15.0
-    working_directory: ~/repo
+    executor: app-executor
     steps:
       - checkout
-      - run:
-          name: Show current branch
-          command: echo $CIRCLE_BRANCH
-      - restore_cache:
-          keys:
-            - app-{{ checksum "package.json"}}
-            - app-
-      - run:
-          name: Install dependencies
-          command: npm install
-      - save_cache:
-          paths:
-            - node_modules
-          key: app-{{ checksum "package.json"}}
+      - *show-current-branch-name
+      - *restore-cache
+      - *install-dependencies
+      - *save-cache
   deploy-to-aws-s3:
-    docker:
-      - image: circleci/node:14.15.0
-    working_directory: ~/repo
+    executor: app-executor
     steps:
       - checkout
-      - run:
-          name: Show current branch
-          command: echo $CIRCLE_BRANCH
-      - run:
-          name: Installing AWS CLI
-          working_directory: /
-          command: |
-            sudo apt-get install python-dev python-pip
-            sudo pip install awscli
-      - run:
-          name: Build project
-          command: |
-            npm install
-            npm run build
-            zip build.zip -r build
-            echo "Build successful"
+      - *show-current-branch-name
+      - *install-aws-cli
+      - *build-project
       - run:
           name: Deploy to AWS S3
           command: |
@@ -56,27 +70,12 @@ jobs:
               aws --region $AWS_REGION s3 sync ~/repo/build s3://${AWS_BUCKET_DEV} --delete
             fi
   deploy-to-aws-cloudfront:
-    docker:
-      - image: circleci/node:14.15.0
-    working_directory: ~/repo
+    executor: app-executor
     steps:
       - checkout
-      - run:
-          name: Show current branch
-          command: echo $CIRCLE_BRANCH
-      - run:
-          name: Installing AWS CLI
-          working_directory: /
-          command: |
-            sudo apt-get install python-dev python-pip
-            sudo pip install awscli
-      - run:
-          name: Build project
-          command: |
-            npm install
-            npm run build
-            zip build.zip -r build
-            echo "Build successful"
+      - *show-current-branch-name
+      - *install-aws-cli
+      - *build-project
       - run:
           name: Activate cloudfront
           command: |
@@ -92,7 +91,7 @@ jobs:
             then
               aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_STAGING --paths "/*"
             else
-              aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DEV --paths "/*"
+              aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DEV --paths "/*" 
             fi
 workflows:
   build_and_deploy:
