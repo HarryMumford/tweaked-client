@@ -131,7 +131,7 @@ workflows:
                 - master
       - deploy-to-aws-cloudfront:
           requires:
-            - build
+            - lint
           filters:
             branches:
               only:
