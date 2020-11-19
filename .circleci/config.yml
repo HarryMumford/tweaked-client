@@ -216,6 +216,7 @@ workflows:
                 - staging
                 - master
       - notify-via-slack:
+          context: slack-secrets
           requires:
             - deploy-to-aws-cloudfront
           filters:
