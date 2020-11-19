@@ -1,10 +1,17 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.1.1
+
 executors:
-  app-executor:
+  app:
     docker:
       - image: circleci/node:14.15.0
     working_directory: ~/repo
+  slack:
+    docker:
+      - image: 'cibuilds/base:latest'
+    resource_class: small
 
 aliases:
   - &show-current-branch-name
@@ -53,7 +60,7 @@ aliases:
 
 jobs:
   build:
-    executor: app-executor
+    executor: app
     steps:
       - checkout
       - *show-current-branch-name
@@ -62,7 +69,7 @@ jobs:
       - *save-cache
 
   lint:
-    executor: app-executor
+    executor: app
     steps:
       - checkout
       - *show-current-branch-name
@@ -70,7 +77,7 @@ jobs:
       - *run-linter
 
   check-code-style:
-    executor: app-executor
+    executor: app
     steps:
       - checkout
       - *show-current-branch-name
@@ -78,7 +85,7 @@ jobs:
       - *run-prettier
 
   deploy-to-aws-s3:
-    executor: app-executor
+    executor: app
     steps:
       - checkout
       - *show-current-branch-name
@@ -98,7 +105,7 @@ jobs:
             fi
 
   deploy-to-aws-cloudfront:
-    executor: app-executor
+    executor: app
     steps:
       - checkout
       - *show-current-branch-name
@@ -122,6 +129,51 @@ jobs:
               aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DEV --paths "/*" 
             fi
 
+  notify-via-slack:
+    executor: slack
+    steps:
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Build failed on ${CIRCLE_BRANCH} :sweat: :worried: :cold_sweat:"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "https://app.circleci.com/pipelines/github/HarryMumford"
+                  }
+                }
+              ]
+            }
+          event: fail
+      - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Build passed on ${CIRCLE_BRANCH} :smile: :grin: :astonished:"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "https://app.circleci.com/pipelines/github/HarryMumford"
+                  }
+                }
+              ]
+            }
+          event: pass
 workflows:
   build_and_deploy:
     jobs:
@@ -157,6 +209,15 @@ workflows:
       - deploy-to-aws-cloudfront:
           requires:
             - deploy-to-aws-s3
+          filters:
+            branches:
+              only:
+                - develop
+                - staging
+                - master
+      - notify-via-slack:
+          requires:
+            - deploy-to-aws-cloudfront
           filters:
             branches:
               only:
