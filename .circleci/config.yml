@@ -137,17 +137,29 @@ jobs:
             {
               "blocks": [
                 {
-                  "type": "section",
+                  "type": "header",
                   "text": {
-                    "type": "mrkdwn",
-                    "text": "Build failed on ${CIRCLE_BRANCH} :sweat: :worried: :cold_sweat:"
+                    "type": "plain_text",
+                    "text": "Deployment successful! :tada:",
+                    "emoji": true
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "https://app.circleci.com/pipelines/github/HarryMumford"
+                    "text": "On the $CIRCLE_BRANCH branch"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View branch",
+                      "emoji": true
+                    },
+                    "value": "click_me_123",
+                    "url": "https://app.circleci.com/pipelines/github/HarryMumford",
+                    "action_id": "button-action"
                   }
                 }
               ]
@@ -158,17 +170,29 @@ jobs:
             {
               "blocks": [
                 {
-                  "type": "section",
+                  "type": "header",
                   "text": {
-                    "type": "mrkdwn",
-                    "text": "Build passed on ${CIRCLE_BRANCH} :smile: :grin: :astonished:"
+                    "type": "plain_text",
+                    "text": "Deployment failed! :disappointed:",
+                    "emoji": true
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "https://app.circleci.com/pipelines/github/HarryMumford"
+                    "text": "On the $CIRCLE_BRANCH branch"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View branch",
+                      "emoji": true
+                    },
+                    "value": "click_me_123",
+                    "url": "https://app.circleci.com/pipelines/github/HarryMumford",
+                    "action_id": "button-action"
                   }
                 }
               ]
