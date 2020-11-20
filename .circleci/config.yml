@@ -164,7 +164,7 @@ jobs:
                 }
               ]
             }
-          event: fail
+          event: pass
       - slack/notify:
           custom: |
             {
@@ -197,7 +197,7 @@ jobs:
                 }
               ]
             }
-          event: pass
+          event: fail
 workflows:
   build_and_deploy:
     jobs:
