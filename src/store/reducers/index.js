@@ -1,6 +1,6 @@
-// import { combineReducers } from 'redux'
-// import predictions from './predictions'
+import { combineReducers } from 'redux'
+import postReducer from './post'
 
-// const rootReducer = combineReducers({ predictions })
+const rootReducer = combineReducers({ post: postReducer })
 
-// export default rootReducer
+export default rootReducer
