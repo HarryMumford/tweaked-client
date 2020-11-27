@@ -1,0 +1,38 @@
+@use 'src/variables';
+@use "sass:color";
+
+.nav {
+  max-width: 120rem;
+  display: flex;
+  margin: auto;
+  padding: 0 2rem;
+  justify-content: space-between;
+  height: 5rem;
+  background-color: variables.$main-color;
+  .flex-container {
+    max-width: 120rem;
+    display: flex;
+    margin: auto;
+    padding: 0 2rem;
+    justify-content: space-between;
+    height: 5rem;
+    .links {
+      justify-self: end;
+      margin: auto 0;
+      & a {
+        color: variables.$main-text-color;
+        text-transform: uppercase;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+        margin: 0 1.5rem;
+        transition: all 300ms linear 0s;
+        text-decoration: none;
+        cursor: pointer;
+        &:hover {
+          color: variables.$secondary-text-color;
+          border-bottom: 1px solid variables.$secondary-text-color;
+        }
+      }
+    }
+  }
+}
