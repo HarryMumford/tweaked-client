@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { useSpring, config } from 'react-spring'
 import './navBar.scss'
 
@@ -22,15 +21,19 @@ const NavBar = () => {
   return (
     <div className="nav" style={linkAnimation}>
       <div className="flex-container">
-        <div className="links">
-          <a href="#feed">FEED</a>
-          <a href="#wall">WALL</a>
-          <a href="#account">ACCOUNT</a>
-        </div>
+        <a href="#feed">FEED</a>
+        <a href="#wall">WALL</a>
+        <a href="#account">ACCOUNT</a>
       </div>
-      <button type="button" className="icon" onClick={handleMenuToggle}>
-        <FontAwesomeIcon icon={faBars} />
-      </button>
+      <div
+        onKeyDown={handleMenuToggle}
+        role="button"
+        tabIndex={0}
+        className="burger-menu"
+        onClick={handleMenuToggle}
+      >
+        <FontAwesomeIcon icon="bars" className="icon" size="lg" />
+      </div>
     </div>
   )
 }
